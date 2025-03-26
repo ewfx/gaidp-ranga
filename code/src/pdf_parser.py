@@ -68,7 +68,12 @@ def generate_rules_with_gemini(chunks):
                 print(f"Error generating rules: {e}")
                 rules.append("Error occurred")
 
-    return clean_and_format_json(rules)
+    validation_rules = clean_and_format_json(rules)
+    output_file_path = os.path.join(os.path.dirname(__file__), "output/validation_rules.json")
+    with open(output_file_path, "w") as f:
+        f.write(validation_rules)
+
+    return validation_rules
 
 
 def update_rules(existing_rules, user_prompt, max_retries=5):
@@ -87,7 +92,11 @@ def update_rules(existing_rules, user_prompt, max_retries=5):
         try:
             response = model.generate_content([prompt])
             updated_rules = response.text.strip() if response.text else "No rules generated."
-            return clean_and_format_json(updated_rules) # Return updated JSON rules
+            update_validation_rules= clean_and_format_json(updated_rules)
+            output_file_path = os.path.join(os.path.dirname(__file__), "output/validation_rules.json")
+            with open(output_file_path, "w") as f:
+                f.write(update_validation_rules)
+            return update_validation_rules
 
         except google.api_core.exceptions.ResourceExhausted:
             print(f"Quota exceeded. Retrying in {retry_delay} seconds...")
@@ -98,10 +107,6 @@ def update_rules(existing_rules, user_prompt, max_retries=5):
 
     return "Failed to update rules after multiple retries."
 
-
-
-# 🔹 Full Execution
-pdf_path = os.path.join(os.path.dirname(__file__), "input/Transaction-Profiling.pdf")
 
 def process_pdf_and_generate_rules(pdf_path):
     """
