@@ -1,11 +1,51 @@
 import streamlit as st
 from google.generativeai import GenerativeModel, configure
+import os
+import sys
 
-# --- Google Gemini API Key ---
-configure(api_key=st.secrets["GOOGLE_API_KEY"])
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from pdf_parser import process_pdf_and_generate_rules, update_rules
+
+# --- Google Gemini API Key from secrets ---
+configure(api_key=st.secrets["gemini_api_key"])
 model = GenerativeModel("gemini-2.0-flash")
 
-# --- Session Initialization ---
+# --- Functions ---
+def process_data_upload(data_file):
+    st.toast(f"📊 Parsing new data file: {data_file.name}")
+    # Add your parsing logic here
+
+def process_profile_rules_upload(rules_file):
+    st.toast(f"📁 Processing profiling rules: {rules_file.name}")
+    
+    # Ensure temp directory exists
+    temp_dir = os.path.abspath(os.path.join(os.getcwd(), "..", "temp"))
+    os.makedirs(temp_dir, exist_ok=True)
+
+    # Get the file extension
+    extension = os.path.splitext(rules_file.name)[1].lower()
+    if extension not in [".pdf"]:
+        st.error(f"Unsupported file type: {extension}")
+        return None
+
+    # Save the file
+    save_path = os.path.join(temp_dir, f"profiles{extension}")
+    with open(save_path, "wb") as f:
+        f.write(rules_file.getbuffer())
+    
+    # Extract rules from the PDF
+    validation_rules = process_pdf_and_generate_rules(save_path)
+
+    st.session_state.chat_history.append({"role": "assistant", "message": validation_rules})
+    st.session_state.validation_rules = validation_rules
+
+def file_changed(file1, file2):
+    if not file1 or not file2:
+        return True
+    return file1.getvalue() != file2.getvalue()
+
+# -- Session State Init --
 if "rules_file" not in st.session_state:
     st.session_state.rules_file = None
 if "data_file" not in st.session_state:
@@ -14,44 +54,73 @@ if "chat_mode" not in st.session_state:
     st.session_state.chat_mode = False
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
+if "rules_uploaded_once" not in st.session_state:
+    st.session_state.rules_uploaded_once = False
+if "data_uploaded_once" not in st.session_state:
+    st.session_state.data_uploaded_once = False
 
-# --- Sidebar Uploads (Always Enabled in Chat Mode) ---
+# -- Sidebar Uploads (Only shown in chat mode) --
 if st.session_state.chat_mode:
     with st.sidebar:
-        st.markdown("### 📂 Upload Files")
-        st.session_state.rules_file = st.file_uploader(
-            "📄 Data Profiling Rules", type=["txt", "pdf", "json", "csv"], key="rules_sidebar", label_visibility="visible"
-        )
-        st.session_state.data_file = st.file_uploader(
-            "📊 Data", type=["csv", "xlsx", "json"], key="data_sidebar", label_visibility="visible"
-        )
+        st.markdown("### ⚙️ Upload Options")
 
-# --- Main Header ---
-st.title("🔍 Data Profiler with AI Chat Assistant")
+        rules_file_sidebar = st.file_uploader(
+            "📋 Upload Data Profiling Rules",
+            type=["pdf"],
+            key="rules_sidebar"
+        )
+        if rules_file_sidebar:
+            if (
+                not st.session_state.rules_file
+                or file_changed(rules_file_sidebar, st.session_state.rules_file)
+            ):
+                st.session_state.rules_file = rules_file_sidebar
+                saved_path = process_profile_rules_upload(rules_file_sidebar)
+                st.session_state.rules_uploaded_once = True
 
-# --- Upload Section Before Chat Starts ---
+        data_file = st.file_uploader(
+            "📊 Upload Data File",
+            type=["csv", "xlsx", "json"],
+            key="data_sidebar"
+        )
+        if data_file:
+            if (
+                not st.session_state.data_uploaded_once or
+                file_changed(data_file, st.session_state.rules_file)
+            ):
+                st.session_state.data_file = data_file
+                process_data_upload(data_file)
+                st.session_state.data_uploaded_once = True
+
+# -- Initial Screen: Only Profiling Rules Upload --
 if not st.session_state.chat_mode:
-    rules_file = st.file_uploader("Upload Data Profiling Rules", type=["txt", "pdf", "json", "csv"], key="rules_upload")
-    data_file = st.file_uploader("Upload Data", type=["csv", "xlsx", "json"], key="data_upload")
+    st.title("📋 Upload Data Profiling Rules")
+    rules_file = st.file_uploader(
+        "Upload Data Profiling Rules",
+        type=["txt", "pdf", "json", "csv"],
+        key="rules_upload_main"
+    )
 
-    if rules_file and data_file:
-        st.session_state.rules_file = rules_file
-        st.session_state.data_file = data_file
-        st.success("✅ Both files uploaded successfully!")
-        st.session_state.chat_mode = True
-        st.rerun()
+    if rules_file:
+        if (
+            not st.session_state.rules_uploaded_once or
+            file_changed(rules_file, st.session_state.rules_file)
+        ):
+            st.session_state.rules_file = rules_file
+            saved_path = process_profile_rules_upload(rules_file)
+            st.session_state.rules_uploaded_once = True
+            st.session_state.chat_mode = True
+            st.rerun()
 
-# --- Chat Interface ---
+# -- Chat Interface --
 if st.session_state.chat_mode:
     st.markdown("## 💬 AI Assistant")
 
-    # Show chat history
     for chat in st.session_state.chat_history:
         with st.chat_message(chat["role"]):
             st.markdown(chat["message"])
 
-    # Chat input
-    prompt = st.chat_input("Ask about the data profiling rules or uploaded data...")
+    prompt = st.chat_input("Ask anything about profiling rules or data...")
 
     if prompt:
         with st.chat_message("user"):
@@ -61,8 +130,10 @@ if st.session_state.chat_mode:
         with st.chat_message("assistant"):
             with st.spinner("Gemini is thinking..."):
                 try:
-                    response = model.generate_content(prompt)
-                    answer = response.text
+                    #response = model.generate_content(prompt)
+                    response = update_rules(st.session_state.validation_rules, prompt)
+                    answer = response
+                    st.session_state.validation_rules = response
                 except Exception as e:
                     answer = f"❌ Error from Gemini API: {e}"
 

@@ -101,7 +101,6 @@ def update_rules(existing_rules, user_prompt, max_retries=5):
 
 
 # 🔹 Full Execution
-pdf_path = os.path.join(os.path.dirname(__file__), "input/Transaction-Profiling.pdf")
 
 def process_pdf_and_generate_rules(pdf_path):
     """
