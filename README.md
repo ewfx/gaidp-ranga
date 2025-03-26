@@ -82,5 +82,5 @@ Regulatory compliance is a **critical challenge** in the financial sector, requi
 
 
 ## 👥 Team-RANGA
-- **Gautam Singh** - [GitHub](#) | [LinkedIn](#)
+- **Gautam Singh** - [GitHub](https://github.com/gautamdevloper) | [LinkedIn](https://www.linkedin.com/in/gautam-singh-1707/)
 - **Rahul Priyadarshi** - [GitHub](https://github.com/rahulp99) | [LinkedIn](https://www.linkedin.com/in/rahul-pr99/)
