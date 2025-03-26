@@ -85,4 +85,4 @@ Regulatory compliance is a **critical challenge** in the financial sector, requi
 - **Rahul Priyadarshi** - [GitHub](https://github.com/rahulp99) | [LinkedIn](https://www.linkedin.com/in/rahul-pr99/)
 - **Akshaj Sunil** - [GitHub](https://github.com/akshajsunil) | [LinkedIn](https://www.linkedin.com/in/akshaj-sunil-ba219a179/)
 - **Arjun Bindu Jayachandran** - [GitHub](https://github.com/Arjun-B-J) | [LinkedIn](https://www.linkedin.com/in/arjun-bindu-jayachandran-76741a185/)
-- **Naveen Kumar Vunnam** - [GitHub](https://www.linkedin.com/in/naveen-kumar-vunnam-9a064b177) | [LinkedIn](https://www.linkedin.com/in/naveen-kumar-vunnam-9a064b177/)
+- **Naveen Kumar Vunnam** - [GitHub](https://github.com/Naveen219) | [LinkedIn](https://www.linkedin.com/in/naveen-kumar-vunnam-9a064b177/)
