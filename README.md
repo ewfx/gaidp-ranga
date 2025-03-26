@@ -62,7 +62,7 @@ Regulatory compliance is a **critical challenge** in the financial sector, requi
 ## 🏃 How to Run  
 1. Clone the repository  
    ```sh
-   git clone https://github.com/your-repo.git
+   git clone https://github.com/ewfx/gaidp-ranga.git
 
 2. Install dependencies  
    ```sh
