@@ -21,7 +21,7 @@ Automated Data Profiling for Regulatory Reporting is a system that uses **Genera
 ---
 
 ## 🎥 Demo  
-🔗 [Live Demo](#) *(Coming Soon)*  
+🔗 [Live Demo](https://drive.google.com/file/d/1E4YUHqEBMp4MVgqeY1aFmDyGEPbSDhhd/view?usp=sharing) 
 📹 [Video Demo](#) *(Coming Soon)*  
 🖼️ Screenshots:  
 ![Screenshot 1](link-to-image)  
