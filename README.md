@@ -58,18 +58,12 @@ Regulatory compliance is a **critical challenge** in the financial sector, requi
 
 ---
 
-## 🏃 How to Run  
-1. Clone the repository  
-   ```sh
-   git clone https://github.com/your-repo.git
-   cd your-repo
-
 
 ## 🏃 How to Run  
 1. Clone the repository  
    ```sh
    git clone https://github.com/your-repo.git
-   cd your-repo
+
 2. Install dependencies  
    ```sh
    pip install -r requirements.txt  
@@ -81,12 +75,12 @@ Regulatory compliance is a **critical challenge** in the financial sector, requi
    ```
 
 ## 🏗️ Tech Stack
-- 🔹 Frontend: React / Vue / Angular
-- 🔹 Backend: Node.js / FastAPI / Django
-- 🔹 Database: PostgreSQL / Firebase
-- 🔹 Other: OpenAI API / Twilio / Stripe
+- 🔹 Frontend: Streamlit
+- 🔹 Backend: Python
+- 🔹 Machine Learning: OpenAI API (LLMs), Scikit-learn, Pandas, numpy
+- 🔹 Other: Google Generative AI, PyMuPDF
 
 
 ## 👥 Team-RANGA
-- **Your Name** - [GitHub](#) | [LinkedIn](#)
+- Gautam Singh - [GitHub](#) | [LinkedIn](#)
 - **Teammate 2** - [GitHub](#) | [LinkedIn](#)
