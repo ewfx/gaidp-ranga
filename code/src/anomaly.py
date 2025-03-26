@@ -15,7 +15,7 @@ GEMINI_API_KEY = "AIzaSyAVd0JIXEGcOiFx_DmCoHMfHfaD2n0LoGU"
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Load CSV file
-df = pd.read_csv("output/data.csv")
+df = pd.read_csv("input/data.csv")
 
 # clustering 
 
