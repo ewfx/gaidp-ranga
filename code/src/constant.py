@@ -1,3 +1,7 @@
+import os
+
+API_KEY="YOUR_API_KEY"
+MODEL="gemini-2.0-flash"
 RULE_GENERATION_PROMPT_TEMPLATE = """
     You are given a field definition containing a column name and its description. Your task is to generate validation rules based on the description and return the output strictly in JSON format.
 
@@ -61,3 +65,7 @@ RULE_MODIFICATION_PROMPT_TEMPLATE = """
 
 max_retries = 5
 retry_delay = 60 
+LOG_FILE =  os.path.join(os.path.dirname(__file__), "output/gemini_log.txt")
+VALIDATED_CSV =  os.path.join(os.path.dirname(__file__),"output/validated_data.csv")
+RULES_FILE = os.path.join(os.path.dirname(__file__), "output/validation_rules.json")
+BATCH_SIZE = 5

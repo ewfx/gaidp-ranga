@@ -9,7 +9,7 @@ from constant import *
 from utils import clean_and_format_json
 
 # 🔹 Configure Google Gemini API Key
-genai.configure(api_key="")
+genai.configure(api_key=API_KEY)
 
 
 def extract_text_from_pdf(pdf_path):
@@ -48,7 +48,7 @@ def generate_rules_with_gemini(chunks):
     Calls Gemini API to generate validation rules for extracted field descriptions.
     Implements retries for quota handling.
     """
-    model = genai.GenerativeModel("gemini-2.0-flash")  # Using the latest Gemini model
+    model = genai.GenerativeModel(model_name=MODEL)  # Using the latest Gemini model
     rules = []
     
     for chunk in chunks:
@@ -86,7 +86,7 @@ def update_rules(existing_rules, user_prompt, max_retries=5):
         existing_rules=json.dumps(existing_rules, indent=2), 
         user_prompt=user_prompt
     )
-    model = genai.GenerativeModel("gemini-2.0-flash")
+    model = genai.GenerativeModel(model_name=MODEL)
 
     for attempt in range(max_retries):
         try:
