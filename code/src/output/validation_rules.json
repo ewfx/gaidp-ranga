@@ -1,0 +1,81 @@
+[
+    {
+        "Column Name": "Transaction ID",
+        "Description": "Unique identifier for each transaction.",
+        "Rules": [
+            "Alphanumeric",
+            "Must be unique"
+        ]
+    },
+    {
+        "Column Name": "Customer ID",
+        "Description": "Unique internal identifier for the customer involved in the transaction.",
+        "Rules": [
+            "Alphanumeric",
+            "Must not be null"
+        ]
+    },
+    {
+        "Column Name": "Account Balance",
+        "Description": "The balance in the customer's account at the time of transaction.",
+        "Rules": [
+            "Numeric",
+            "Must not be negative except for overdraft accounts explicitly marked with an \"OD\" flag"
+        ]
+    },
+    {
+        "Column Name": "Reported Amount",
+        "Description": "The amount reported for the transaction.",
+        "Rules": [
+            "Numeric",
+            "Must be greater than zero"
+        ]
+    },
+    {
+        "Column Name": "Transaction Amount",
+        "Description": "The actual amount processed in the transaction.",
+        "Rules": [
+            "Must match Reported Amount, except for cross-currency conversions where a deviation of up to 1% is allowed"
+        ]
+    },
+    {
+        "Column Name": "Currency",
+        "Description": "The currency in which the transaction is recorded.",
+        "Rules": [
+            "Must be a valid ISO 4217 currency code",
+            "Transactions must adhere to cross-border transaction limits per regulatory guidelines"
+        ]
+    },
+    {
+        "Column Name": "Country",
+        "Description": "The country where the transaction originated.",
+        "Rules": [
+            "Must be a valid ISO 3166-1 alpha-2 country code",
+            "Cross-border transactions must include mandatory transaction remarks if the amount exceeds regulatory thresholds"
+        ]
+    },
+    {
+        "Column Name": "Transaction Date",
+        "Description": "The date when the transaction occurred.",
+        "Rules": [
+            "Must not be in the future",
+            "Transactions older than 365 days should trigger a data validation alert"
+        ]
+    },
+    {
+        "Column Name": "Merchant ID",
+        "Description": "Unique identifier for the merchant processing the transaction.",
+        "Rules": [
+            "Alphanumeric",
+            "Must be valid if present"
+        ]
+    },
+    {
+        "Column Name": "Payment Method",
+        "Description": "Mode of transaction (e.g., Credit Card, Wire Transfer, Cash).",
+        "Rules": [
+            "Must be a valid payment type",
+            "Cross-border transactions via cash should require additional verification"
+        ]
+    }
+]
