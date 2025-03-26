@@ -9,7 +9,7 @@ from constant import *
 from utils import clean_and_format_json
 
 # 🔹 Configure Google Gemini API Key
-genai.configure(api_key="YOUR_API_KEY")
+genai.configure(api_key="")
 
 
 def extract_text_from_pdf(pdf_path):
@@ -103,35 +103,24 @@ def update_rules(existing_rules, user_prompt, max_retries=5):
 # 🔹 Full Execution
 pdf_path = os.path.join(os.path.dirname(__file__), "input/Transaction-Profiling.pdf")
 
-# Step 1: Extract text
-extracted_text = extract_text_from_pdf(pdf_path)
+def process_pdf_and_generate_rules(pdf_path):
+    """
+    Extracts text from a PDF, splits it into field-based chunks, 
+    and generates validation rules using Gemini.
 
+    Args:
+        pdf_path (str or file-like object): Path to the PDF file or uploaded file object.
 
-# Step 2: Dynamically split into field-based chunks
-field_chunks = chunk_text_dynamically(extracted_text)
+    Returns:
+        list: Generated validation rules in JSON format.
+    """
+    # Step 1: Extract text
+    extracted_text = extract_text_from_pdf(pdf_path)
 
+    # Step 2: Dynamically split into field-based chunks
+    field_chunks = chunk_text_dynamically(extracted_text)
 
-# Step 3: Pass chunks to Gemini for rule generation
-validation_rules = generate_rules_with_gemini(field_chunks)
+    # Step 3: Pass chunks to Gemini for rule generation
+    validation_rules = generate_rules_with_gemini(field_chunks)
 
-# Save Output to a file
-output_file_path = os.path.join(os.path.dirname(__file__), "output/validation_rules.json")
-with open(output_file_path, "w") as f:
-    f.write(validation_rules)
-
-
-
-user_input = """
-Include a new rule that transactions above $10,000 should require additional verification.
-Modify the existing rule to allow a 2% deviation for cross-currency transactions instead of 1%.
-"""
-
-updated_rules = update_rules(validation_rules, user_input)
-
-# Save Output to a file
-output_file_path = os.path.join(os.path.dirname(__file__), "output/validation_rules-regenerate.json")
-
-with open(output_file_path, "w") as f:
-    f.write(updated_rules)
-
-print(f"Validation rules saved to {output_file_path}")
+    return validation_rules
