@@ -1,4 +1,5 @@
 import base64
+import json
 import streamlit as st
 from google.generativeai import GenerativeModel, configure
 import os
@@ -49,8 +50,15 @@ def process_profile_rules_upload(rules_file):
     
     # Extract rules from the PDF
     validation_rules = process_pdf_and_generate_rules(save_path)
+    
+    try:
+        parsed_json = json.loads(validation_rules)
+        pretty_json = json.dumps(parsed_json, indent=2)
+        chat_message_text = f"```json\n{pretty_json}\n```"
+    except:
+        chat_message_text = validation_rules
 
-    st.session_state.chat_history.append({"role": "assistant", "message": validation_rules})
+    st.session_state.chat_history.append({"role": "assistant", "message": chat_message_text})
     st.session_state.validation_rules = validation_rules
 
 def file_changed(file1, file2):
@@ -144,10 +152,15 @@ if st.session_state.chat_mode:
             with st.spinner("Model is thinking..."):
                 try:
                     response = update_rules(st.session_state.validation_rules, prompt)
-                    answer = response
+                    try:
+                        parsed_json = json.loads(response)
+                        pretty_json = json.dumps(parsed_json, indent=2)
+                        chat_message_text = f"```json\n{pretty_json}\n```"
+                    except:
+                        chat_message_text = response
                     st.session_state.validation_rules = response
                 except Exception as e:
                     answer = f"❌ Error from Model: {e}"
 
-                st.markdown(answer)
-                st.session_state.chat_history.append({"role": "assistant", "message": answer})
+                st.markdown(chat_message_text)
+                st.session_state.chat_history.append({"role": "assistant", "message": chat_message_text})
