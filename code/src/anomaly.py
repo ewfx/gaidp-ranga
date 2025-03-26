@@ -3,14 +3,94 @@ import json
 import time
 import google.generativeai as genai
 import re
-
+from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.ensemble import IsolationForest
+from sklearn.cluster import DBSCAN
+import json
+import pandas as pd
+import numpy as np
+import tiktoken
 # Configure Gemini API Key
 GEMINI_API_KEY = "AIzaSyAVd0JIXEGcOiFx_DmCoHMfHfaD2n0LoGU"
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Load CSV file
-df = pd.read_csv("input/data.csv")
+df = pd.read_csv("output/data.csv")
 
+# clustering 
+
+
+def detect_anomalies_clustering2(df, anomaly_threshold=1.5):
+    """
+    Detect anomalies using Isolation Forest for numerical data and DBSCAN for categorical data.
+    
+    Parameters:
+    - df (pd.DataFrame): Input DataFrame
+    - anomaly_threshold (float): Minimum anomaly score to consider a row as an anomaly
+    
+    Returns:
+    - pd.DataFrame: DataFrame containing only the anomalous rows
+    """
+    df_clean = df.copy()
+    
+    # Separate numerical and categorical columns
+    numerical_cols = df_clean.select_dtypes(include=['int64', 'float64']).columns.tolist()
+    categorical_cols = df_clean.select_dtypes(include=['object']).columns.tolist()
+    
+    anomaly_scores = np.zeros(len(df_clean))  # Initialize anomaly scores
+    
+    # Process numerical data
+    if numerical_cols:
+        scaler = StandardScaler()
+        scaled_numerical_data = scaler.fit_transform(df_clean[numerical_cols])
+        
+        # Apply Isolation Forest
+        iso_forest = IsolationForest(contamination='auto', random_state=42)
+        num_anomaly_scores = -iso_forest.fit(scaled_numerical_data).decision_function(scaled_numerical_data)
+        
+        # Assign higher weight to individual extreme values
+        for i, col in enumerate(numerical_cols):
+            col_scores = np.abs(scaled_numerical_data[:, i]) * num_anomaly_scores
+            anomaly_scores += col_scores
+    
+    # Process categorical data
+    if categorical_cols:
+        encoder = OneHotEncoder(handle_unknown='ignore')
+        encoded_categorical_data = encoder.fit_transform(df_clean[categorical_cols]).toarray()
+        
+        # Apply DBSCAN for density-based anomaly detection
+        dbscan = DBSCAN(eps=0.5, min_samples=3, metric='hamming')
+        cat_anomaly_pred = dbscan.fit_predict(encoded_categorical_data)
+        
+        # Increase anomaly score for categorical anomalies
+        for j in range(len(df_clean)):
+            if cat_anomaly_pred[j] == -1:
+                anomaly_scores[j] += 2  # Weight categorical anomalies
+    
+    # Add anomaly scores to the DataFrame
+    df_clean['anomaly_score'] = anomaly_scores
+    
+    # Return only rows where the anomaly score exceeds the threshold
+    anomalies_df = df_clean[df_clean['anomaly_score'] > anomaly_threshold]
+    return anomalies_df
+
+# Process Data file
+
+def processData(df):
+    # Tokenization
+    enc = tiktoken.get_encoding("cl100k_base")
+    token_count = sum(len(enc.encode(str(row))) for row in df.astype(str).values.flatten())
+    
+    # Free Gemini API token limit (e.g., 8k tokens per request)
+    FREE_GEMINI_TOKEN_LIMIT = 8000
+    
+    if token_count > FREE_GEMINI_TOKEN_LIMIT:
+        print("Token limit exceeded, running anomaly detection...")
+        return detect_anomalies_clustering2(df)
+    else:
+        print("Token limit not exceeded")
+        return df
+df = processData(df)
 # Load JSON rules
 with open("output/validation_rules.json", "r") as file:
     rules = json.load(file)
