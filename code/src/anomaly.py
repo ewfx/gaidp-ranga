@@ -11,7 +11,7 @@ import pandas as pd
 import numpy as np
 import tiktoken
 # Configure Gemini API Key
-GEMINI_API_KEY = "AIzaSyAVd0JIXEGcOiFx_DmCoHMfHfaD2n0LoGU"
+GEMINI_API_KEY = "xxx"
 genai.configure(api_key=GEMINI_API_KEY)
 
 # Load CSV file
